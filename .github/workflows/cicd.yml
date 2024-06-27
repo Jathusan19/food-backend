@@ -14,14 +14,14 @@ jobs:
 
       - name: Login to Docker Hub
         run: |
-          echo "dckr_pat_KwqHJFK7r_wE01EJFXnIn4I1Qcg" | docker login -u "jathusan19" --password-stdin
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
           echo "Login result: $?"
 
       - name: Build Docker Image
-        run: docker build -t Jathusan19/food-backend .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/food-backend .
 
       - name: Publish Docker Image
-        run: docker push Jathusan19/food-backend:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/food-backend:latest
 
   publish:
     needs: build
@@ -31,7 +31,7 @@ jobs:
         run: docker system prune -a --volumes -f
 
       - name: Pull Docker Image
-        run: docker pull Jathusan19/food-backend:latest
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/food-backend:latest
 
       - name: Delete old container if exists
         run: |
@@ -40,4 +40,4 @@ jobs:
           fi
 
       - name: Run Docker Container
-        run: docker run -d -p 7000:7000 --name food-backend Jathusan19/food-backend:latest
+        run: docker run -d -p 7000:7000 --name food-backend ${{ secrets.DOCKER_USERNAME }}/food-backend:latest
