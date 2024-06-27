@@ -1,0 +1,41 @@
+name: Deploy Node Application
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build Docker Image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/food-backend .
+
+      - name: Publish Docker Image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/food-backend:latest
+
+  publish:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Clean up Docker
+        run: docker system prune -a --volumes -f
+
+      - name: Pull Docker Image
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/food-backend:latest
+
+      - name: Delete old container if exists
+        run: |
+          if [ $(docker ps -a -q -f name=food-backend) ]; then
+            docker rm -f food-backend
+          fi
+
+      - name: Run Docker Container
+        run: docker run -d -p 7000:7000 --name food-backend ${{ secrets.DOCKER_USERNAME }}/food-backend

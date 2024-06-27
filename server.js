@@ -39,6 +39,9 @@ const User = mongoose.model('Admin', AdminSchema,'Admin');
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+    res.send('Hello World!');
+})
 
 
 app.post('/api/login', async (req, res) => {
