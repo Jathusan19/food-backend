@@ -38,4 +38,4 @@ jobs:
           fi
 
       - name: Run Docker Container
-        run: docker run -d -p 7000:7000 --name food-backend ${{ secrets.DOCKER_USERNAME }}/food-backend
+        run: docker run -d -p 7000:7000 --name food-backend ${{ secrets.DOCKER_USERNAME }}/food-backend:latest
